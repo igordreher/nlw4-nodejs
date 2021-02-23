@@ -9,3 +9,20 @@ services:
     command: sh -c "npm run dev"
     volumes: 
       - ./src:/usr/app/src
+    depends_on: 
+      - pg
+    links: 
+      - pg
+      
+  pg:
+    container_name: postgresql
+    image: postgres:alpine
+    ports: 
+      - 80:5432
+    environment: 
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=database
+    volumes: 
+      - ./data:/var/lib/postgresql/data
+  
