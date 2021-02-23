@@ -6,7 +6,9 @@
   "author": "",
   "license": "ISC",
   "scripts": {
-    "dev": "ts-node-dev --transpile-only --ignore-watch node_modules src/server.ts"
+    "dev": "ts-node-dev --transpile-only --ignore-watch node_modules src/server.ts",
+    "migrate": "ts-node-dev node_modules/typeorm/cli migration:run",
+    "typeorm": "ts-node-dev node_modules/typeorm/cli"
   },
   "dependencies": {
     "express": "^4.17.1",
