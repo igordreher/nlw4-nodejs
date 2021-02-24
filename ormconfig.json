@@ -1,6 +1,6 @@
 {
     "type": "postgres",
-    "url": "postgres://postgres:postgres@pg:5432/database",
+    "url": "postgres://postgres:postgres@pg/database",
     "migrations": ["./src/database/migrations/**.ts"],
     "entities": ["./src/models/**.ts"],
     "cli":{

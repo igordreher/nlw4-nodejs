@@ -13,6 +13,7 @@ describe('User', () => {
     });
 
     afterAll(async () => {
+        await connection.dropDatabase();
         await connection.close();
     });
 
