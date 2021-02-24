@@ -1,10 +1,6 @@
 {
     "type": "postgres",
-    "database":"database",
-    "host": "pg",
-    "port": 5432,
-    "username": "postgres",
-    "password": "postgres",
+    "url": "postgres://postgres:postgres@pg:5432/database",
     "migrations": ["./src/database/migrations/**.ts"],
     "entities": ["./src/models/**.ts"],
     "cli":{
