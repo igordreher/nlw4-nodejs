@@ -4,6 +4,7 @@ import { SurveysRepository } from '../repositories/SurveysRepository';
 import { SurveysUsersRepository } from '../repositories/SurveysUsersRepository';
 import { UsersRepository } from '../repositories/UsersRepository';
 import SendMailService from '../services/SendMailService';
+import path from 'path';
 
 export default {
     async execute(req: Request, res: Response) {
@@ -21,17 +22,26 @@ export default {
         if (!surveyFound)
             return res.status(400).json({ error: 'survey not found' });
 
+        const npsPath = path.resolve(__dirname, '..', 'views', 'emails', 'npsMail.hbs');
+        await SendMailService.execute(userFound.email, surveyFound.title, {
+            name: userFound.name,
+            title: surveyFound.title,
+            description: surveyFound.description,
+            user_id: userFound.id,
+            link: process.env.URL_MAIL
+        }, npsPath);
+
+        const surveyUserFound = await surveysUsersRepository.findOne({
+            where: [{ user_id: userFound.id }, { value: null }]
+        });
+        if (surveyUserFound)
+            return res.json(surveyUserFound);
+
         const surveyUser = surveysUsersRepository.create({
             user_id: userFound.id,
             survey_id
         });
-        try {
-            await surveysUsersRepository.save(surveyUser);
-            await SendMailService.execute(userFound.email, surveyFound.title, surveyFound.description);
-        } catch (error) {
-            console.log(error.message);
-            return res.status(500).json({ error: error.message });
-        }
+        await surveysUsersRepository.save(surveyUser);
 
         return res.status(201).json(surveyUser);
     }
