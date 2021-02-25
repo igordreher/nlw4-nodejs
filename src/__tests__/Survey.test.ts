@@ -8,6 +8,7 @@ describe('Survey', () => {
 
     beforeAll(async () => {
         connection = await createConnection();
+        await connection.dropDatabase();
         await connection.runMigrations();
     });
 
