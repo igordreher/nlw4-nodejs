@@ -23,26 +23,29 @@ export default {
             return res.status(400).json({ error: 'survey not found' });
 
         const npsPath = path.resolve(__dirname, '..', 'views', 'emails', 'npsMail.hbs');
-        await SendMailService.execute(userFound.email, surveyFound.title, {
+
+        let surveyUserFound = await surveysUsersRepository.findOne({
+            where: { user_id: userFound.id, survey_id: surveyFound.id },
+            relations: ['user', 'survey']
+        });
+
+        if (!surveyUserFound) {
+            surveyUserFound = surveysUsersRepository.create({
+                user_id: userFound.id,
+                survey_id
+            });
+            await surveysUsersRepository.save(surveyUserFound);
+        }
+
+        const mailVariables = {
             name: userFound.name,
             title: surveyFound.title,
             description: surveyFound.description,
-            user_id: userFound.id,
+            id: surveyUserFound.id,
             link: process.env.URL_MAIL
-        }, npsPath);
+        };
 
-        const surveyUserFound = await surveysUsersRepository.findOne({
-            where: [{ user_id: userFound.id }, { value: null }]
-        });
-        if (surveyUserFound)
-            return res.json(surveyUserFound);
-
-        const surveyUser = surveysUsersRepository.create({
-            user_id: userFound.id,
-            survey_id
-        });
-        await surveysUsersRepository.save(surveyUser);
-
-        return res.status(201).json(surveyUser);
+        await SendMailService.execute(userFound.email, surveyFound.title, mailVariables, npsPath);
+        return res.status(201).json(surveyUserFound);
     }
 };
