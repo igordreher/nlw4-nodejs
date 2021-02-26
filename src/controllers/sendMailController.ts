@@ -5,10 +5,18 @@ import { SurveysUsersRepository } from '../repositories/SurveysUsersRepository';
 import { UsersRepository } from '../repositories/UsersRepository';
 import SendMailService from '../services/SendMailService';
 import path from 'path';
+import * as yup from 'yup';
+import { AppError } from '../errors/AppError';
 
 export default {
     async execute(req: Request, res: Response) {
         const { email, survey_id } = req.body;
+
+        const schema = yup.object({
+            email: yup.string().email().required(),
+            survey_id: yup.string().required()
+        });
+        await schema.validate({ email, survey_id });
 
         const usersRepository = getCustomRepository(UsersRepository);
         const surveysRepository = getCustomRepository(SurveysRepository);
@@ -16,11 +24,11 @@ export default {
 
         const userFound = await usersRepository.findOne({ email });
         if (!userFound)
-            return res.status(400).json({ error: 'user with given email not found' });
+            throw new AppError('User email not found');
 
         const surveyFound = await surveysRepository.findOne({ id: survey_id });
         if (!surveyFound)
-            return res.status(400).json({ error: 'survey not found' });
+            throw new AppError('Survey not found');
 
         const npsPath = path.resolve(__dirname, '..', 'views', 'emails', 'npsMail.hbs');
 
