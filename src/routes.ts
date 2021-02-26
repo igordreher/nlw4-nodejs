@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import answersController from './controllers/answersController';
 import sendMailController from './controllers/sendMailController';
 import surveyController from './controllers/surveyController';
 import userController from './controllers/userController';
@@ -11,5 +12,6 @@ router.post('/surveys', surveyController.create);
 router.get('/surveys', surveyController.show);
 
 router.post('/sendMail', sendMailController.execute);
+router.get('/answers/:value', answersController.execute);
 
 export default router;
